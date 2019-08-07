@@ -42,23 +42,23 @@
     
     self.statusLabel.text = [self getStatusDescWithStatus:[FLSocketManager shareManager].client.status];
     
-    self.connectBtn.selected = [FLSocketManager shareManager].client.status == SocketIOClientStatusDisconnected;
+    self.connectBtn.selected = [FLSocketManager shareManager].client.status == SocketIOStatusDisconnected;
 }
 
-- (NSString *)getStatusDescWithStatus:(SocketIOClientStatus)status {
+- (NSString *)getStatusDescWithStatus:(SocketIOStatus)status {
     
     NSString *statusDesc;
     switch (status) {
-        case SocketIOClientStatusNotConnected:
+        case SocketIOStatusNotConnected:
             statusDesc = @"没有连接";
             break;
-        case SocketIOClientStatusConnected:
+        case SocketIOStatusConnected:
             statusDesc = @"已连接";
             break;
-        case SocketIOClientStatusConnecting:
+        case SocketIOStatusConnecting:
             statusDesc = @"连接中";
             break;
-        case SocketIOClientStatusDisconnected:
+        case SocketIOStatusDisconnected:
             statusDesc = @"连接断开";
             break;
         default:
@@ -98,10 +98,10 @@
 }
 
 #pragma mark - FLClientManagerDelegate
-- (void)clientManager:(FLClientManager *)manager didChangeStatus:(SocketIOClientStatus)status {
+- (void)clientManager:(FLClientManager *)manager didChangeStatus:(SocketIOStatus)status {
     self.statusLabel.text = [self getStatusDescWithStatus:status];
     
-    self.connectBtn.selected = [FLSocketManager shareManager].client.status == SocketIOClientStatusDisconnected;
+    self.connectBtn.selected = [FLSocketManager shareManager].client.status == SocketIOStatusDisconnected;
 }
 
 

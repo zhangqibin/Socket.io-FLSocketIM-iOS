@@ -10,6 +10,6 @@
 
 @interface FLStatusTitleView : UIView
 
-- (void)updateWithLinkStatus:(SocketIOClientStatus)status;
+- (void)updateWithLinkStatus:(SocketIOStatus)status;
 
 @end

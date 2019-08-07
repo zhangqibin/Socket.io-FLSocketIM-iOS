@@ -188,7 +188,7 @@ static NSString *const AMapKey = @"244e549b3c06a865153580b054a98afe";
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     
 //    SocketIOClient *client = [FLSocketManager shareManager].client;
-//    if (client && client.status != SocketIOClientStatusConnected) {
+//    if (client && client.status != SocketIOStatusConnected) {
 //        [client connect];
 //    }
 }

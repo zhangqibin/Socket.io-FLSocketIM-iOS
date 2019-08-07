@@ -69,7 +69,7 @@
  @param manager 客户端管理器
  @param status 变化的状态
  */
-- (void)clientManager:(FLClientManager *)manager didChangeStatus:(SocketIOClientStatus)status;
+- (void)clientManager:(FLClientManager *)manager didChangeStatus:(SocketIOStatus)status;
 
 
 /**

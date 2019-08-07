@@ -199,7 +199,7 @@
     
 }
 
-- (void)clientManager:(FLClientManager *)manager didChangeStatus:(SocketIOClientStatus)status {
+- (void)clientManager:(FLClientManager *)manager didChangeStatus:(SocketIOStatus)status {
     [self.titleView updateWithLinkStatus:status];
 }
 

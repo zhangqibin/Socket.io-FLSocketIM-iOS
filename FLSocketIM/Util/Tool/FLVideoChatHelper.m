@@ -211,7 +211,7 @@ static FLVideoChatHelper *instance = nil;
 - (void)joinRoom:(NSString *)room{
     
     // 如果是在线连接状态
-    if (self.client.status == SocketIOClientStatusConnected) {
+    if (self.client.status == SocketIOStatusConnected) {
         
         [self.client emit:@"__join" with:@[@{@"room" : room}]];
     }

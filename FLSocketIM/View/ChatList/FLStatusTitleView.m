@@ -38,31 +38,31 @@
     [self updateWithLinkStatus:[FLSocketManager shareManager].client.status];
 }
 
-- (void)updateWithLinkStatus:(SocketIOClientStatus)status {
+- (void)updateWithLinkStatus:(SocketIOStatus)status {
     
     switch (status) {
-        case SocketIOClientStatusNotConnected:{
+        case SocketIOStatusNotConnected:{
             
             [_indicator stopAnimating];
             _statusLabel.text = @"FoxChat(未连接)";
             break;
         }
             
-        case SocketIOClientStatusDisconnected:{
+        case SocketIOStatusDisconnected:{
             
             [_indicator stopAnimating];
             _statusLabel.text = @"FoxChat(连接断开)";
             break;
         }
             
-        case SocketIOClientStatusConnecting:{
+        case SocketIOStatusConnecting:{
             
             [_indicator startAnimating];
             _statusLabel.text = @"FoxChat(连接中...)";
             break;
         }
             
-        case SocketIOClientStatusConnected:{
+        case SocketIOStatusConnected:{
             
             [_indicator stopAnimating];
             _statusLabel.text = @"FoxChat";

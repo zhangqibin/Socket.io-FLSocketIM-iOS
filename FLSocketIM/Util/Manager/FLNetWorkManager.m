@@ -29,7 +29,7 @@
         
         
         SocketIOClient *client = [FLSocketManager shareManager].client;
-        if (client && client.status == SocketIOClientStatusDisconnected) {
+        if (client && client.status == SocketIOStatusDisconnected) {
             
             FLLog(@"重新连接Socket");
             [client connect];

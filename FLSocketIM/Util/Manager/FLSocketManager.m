@@ -10,7 +10,7 @@
 
 static FLSocketManager *instance = nil;
 @interface FLSocketManager ()
-
+@property(nonatomic,strong) SocketManager* socketManager;
 @end
 @implementation FLSocketManager
 
@@ -44,12 +44,17 @@ static FLSocketManager *instance = nil;
      来源：https://github.com/socketio/socket.io-client-swift/issues/449
      */
     SocketIOClient* socket;
+    //  fix by zqb 20190807
     if (!self.client) {
-        socket = [[SocketIOClient alloc] initWithSocketURL:url config:@{@"log": @NO, @"forceNew" : @YES, @"forcePolling": @NO, @"reconnectAttempts":@(-1), @"reconnectWait" : @4, @"connectParams": @{@"auth_token" : token}, @"forceWebsockets" : @NO}];
+//        socket = [[SocketIOClient alloc] initWithSocketURL:url config:@{@"log": @NO, @"forceNew" : @YES, @"forcePolling": @NO, @"reconnectAttempts":@(-1), @"reconnectWait" : @4, @"connectParams": @{@"auth_token" : token}, @"forceWebsockets" : @NO}];
+    
+        self.socketManager = [[SocketManager alloc] initWithSocketURL:url config:@{@"log": @NO, @"forceNew" : @YES, @"forcePolling": @NO, @"reconnectAttempts":@(-1), @"reconnectWait" : @4, @"connectParams": @{@"auth_token" : token}, @"forceWebsockets" : @NO}];
+        socket = self.socketManager.defaultSocket;
     }
     else {
         socket = self.client;
-        socket.engine.connectParams = @{@"auth_token" : token};
+//        socket.engine.connectParams = @{@"auth_token" : token};
+        self.socketManager.engine.connectParams = @{@"auth_token" : token};
     }
     
 

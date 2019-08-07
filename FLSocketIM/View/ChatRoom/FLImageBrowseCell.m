@@ -9,6 +9,8 @@
 #import "FLImageBrowseCell.h"
 #import "FLImageBrowseModel.h"
 
+#import <SDWebImage/SDWebImage.h>
+
 @interface FLImageBrowseCell () <UIScrollViewDelegate>
 
 @property (nonatomic, strong) UIScrollView *imageScrollView;

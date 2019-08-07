@@ -31,9 +31,9 @@ PODS:
   - SDWebImage (5.0.6):
     - SDWebImage/Core (= 5.0.6)
   - SDWebImage/Core (5.0.6)
-  - Socket.IO-Client-Swift (11.0.2):
-    - StarscreamSocketIO (~> 8.0.2)
-  - StarscreamSocketIO (8.0.7)
+  - Socket.IO-Client-Swift (13.3.1):
+    - Starscream (~> 3.0.2)
+  - Starscream (3.0.6)
   - YYModel (1.0.4)
 
 DEPENDENCIES:
@@ -47,7 +47,7 @@ DEPENDENCIES:
   - MBProgressHUD
   - MJRefresh
   - SDWebImage
-  - Socket.IO-Client-Swift (~> 11.0.0)
+  - Socket.IO-Client-Swift (~> 13.3.1)
   - YYModel
 
 SPEC REPOS:
@@ -64,7 +64,7 @@ SPEC REPOS:
     - MJRefresh
     - SDWebImage
     - Socket.IO-Client-Swift
-    - StarscreamSocketIO
+    - Starscream
     - YYModel
 
 SPEC CHECKSUMS:
@@ -79,10 +79,10 @@ SPEC CHECKSUMS:
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   MJRefresh: ed450d6eb9d3346a2cb033ab7eb6de090aeef437
   SDWebImage: 920f1a2ff1ca8296ad34f6e0510a1ef1d70ac965
-  Socket.IO-Client-Swift: 17d4daf85d74125c33481d9bc40cbe678f0d631a
-  StarscreamSocketIO: 00b54e4208481ca5cef089545353aaf126bae16d
+  Socket.IO-Client-Swift: 79f8f85fa44881838175a20f9bd2c32bef2c9d37
+  Starscream: ef3ece99d765eeccb67de105bfa143f929026cf5
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
 
-PODFILE CHECKSUM: ce5860780e67857ddbb73062e79bbb9a9bdb40c1
+PODFILE CHECKSUM: 4d381400bd8abe10183e22c280db36afa9bc78dd
 
 COCOAPODS: 1.7.2

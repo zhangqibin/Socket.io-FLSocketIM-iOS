@@ -10,6 +10,8 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
+#import "RTCDataChannel.h"
+
 //google提供的
 static NSString *const RTCSTUNServerURL = @"stun:stun.l.google.com:19302";
 static NSString *const RTCSTUNServerURL2 = @"stun:23.21.150.121";
@@ -19,7 +21,7 @@ static NSString *const RTCSTUNServerURL2 = @"stun:23.21.150.121";
 //    //被发送者
 //    RoleCallee,
 //} Role;
-@interface FLVideoChatHelper () <RTCPeerConnectionDelegate, RTCSessionDescriptionDelegate>
+@interface FLVideoChatHelper () <RTCPeerConnectionDelegate, RTCSessionDescriptionDelegate, RTCDataChannelDelegate>
 
 @property (nonatomic, weak) SocketIOClient *client;
 
@@ -35,6 +37,7 @@ static NSString *const RTCSTUNServerURL2 = @"stun:23.21.150.121";
     NSString *_myId;
     NSMutableDictionary *_connectionDic;
     NSMutableArray *_connectionIdArray;
+    NSMutableDictionary *_localDataChannelDictionary;
     
 //    Role _role;
     
@@ -58,7 +61,7 @@ static FLVideoChatHelper *instance = nil;
 {
     _connectionDic = [NSMutableDictionary dictionary];
     _connectionIdArray = [NSMutableArray array];
-    
+    _localDataChannelDictionary = [NSMutableDictionary dictionary];
 }
 
 - (void)connectRoom:(NSString *)room {
@@ -221,6 +224,12 @@ static FLVideoChatHelper *instance = nil;
  */
 - (void)exitRoom {
     _localStream = nil;
+    
+    [_localDataChannelDictionary enumerateKeysAndObjectsUsingBlock:^(NSString *key, RTCDataChannel *obj, BOOL * _Nonnull stop) {
+        [obj close];
+        [_localDataChannelDictionary removeObjectForKey:key];
+    }];
+    
     [_connectionIdArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self closePeerConnection:obj];
     }];
@@ -393,6 +402,10 @@ static FLVideoChatHelper *instance = nil;
     
     //用工厂来创建连接
     RTCPeerConnection *connection = [_factory peerConnectionWithICEServers:ICEServers constraints:[self peerConnectionConstraints] delegate:self];
+    
+    //  给p2p连接创建dataChannel
+    [self createDataChannelWithPeerConnection:connection connectionId:connectionId];
+    
     return connection;
 }
 
@@ -581,8 +594,79 @@ didSetSessionDescriptionWithError:(NSError *)error
 - (void)peerConnection:(RTCPeerConnection*)peerConnection didOpenDataChannel:(RTCDataChannel*)dataChannel
 
 {
+    dataChannel.delegate = self;
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self sendMessage:@"1"];
+    });
+    
+   
     NSLog(@"%s",__func__);
 }
+
+#pragma mark - P2P Chat
+//  DataChannel的创建是在生成本地offer之前，这样才能在生成offer后，使offer中包含DataChannel的信息。
+- (void)createDataChannelWithPeerConnection:(RTCPeerConnection*)peerConnection connectionId:(NSString*)connectionId{
+    RTCDataChannelInit *config = [[RTCDataChannelInit alloc] init];
+    config.isOrdered = YES;
+    //_peerConnection 在此时必须已经创建了
+    RTCDataChannel *localDataChannel = [peerConnection createDataChannelWithLabel:@"commands" config:config];
+    localDataChannel.delegate = self;
+    [_localDataChannelDictionary setObject:localDataChannel forKey:connectionId];
+}
+
+//  这里需要说一下，如果使用RTCDataChannel发送图片，需要将type设置为image，并且进行base64编码。
+- (void)sendMessage:(NSString *)message
+{
+    NSDictionary* messageDic = @{@"type":@"text",@"value":message};
+    NSData* messageData = [NSJSONSerialization dataWithJSONObject:messageDic options:NSJSONWritingPrettyPrinted error:nil];
+    
+    RTCDataBuffer *buffer = [[RTCDataBuffer alloc] initWithData:messageData isBinary:NO];
+    
+    [_localDataChannelDictionary enumerateKeysAndObjectsUsingBlock:^(NSString* connectionId, RTCDataChannel* dataChannel, BOOL * _Nonnull stop) {
+        bool success = [dataChannel sendData:buffer];
+        if (success){
+            NSLog(@"sendmessageSuccess = %@",message);
+        }else{
+            NSLog(@"SendMessageFailed");
+        }
+    }];
+}
+
+#pragma mark - RTCDataChannelDelegate
+//代理1 判断是否打开成功
+- (void)channelDidChangeState:(RTCDataChannel *)channel
+{
+    switch (channel.state) {
+            
+        case kRTCDataChannelStateOpen:
+            // DSpersonKitLog(@"DataChannel 通道打开");
+            break;
+        case kRTCDataChannelStateClosing:
+            break;
+        case kRTCDataChannelStateClosed:
+            //DSpersonKitLog(@"DataChannel 关闭");
+        {
+            
+        }
+            break;
+        case kRTCDataChannelStateConnecting:
+            // DSpersonKitLog(@"DataChannel 正在开启");
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)channel:(RTCDataChannel*)channel didReceiveMessageWithBuffer:(RTCDataBuffer*)buffer
+{
+    //收到RTCDataChannel对面发送过来的消息. 自己去解析就好
+    UIAlertView *t = [[UIAlertView alloc] initWithTitle:@"新消息" message:nil delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+    [t show];
+    NSLog(@"dddd");
+}
+
+
 
 @end
 

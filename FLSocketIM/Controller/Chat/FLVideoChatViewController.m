@@ -155,7 +155,10 @@
 
 - (void)videoChatHelper:(FLVideoChatHelper *)videoChatHelper addRemoteStream:(RTCMediaStream *)stream userId:(NSString *)userId {
     //缓存起来
-    [_remoteVideoTracks setObject:[stream.videoTracks lastObject] forKey:userId];
+    if (stream.videoTracks.count > 0) {
+        [_remoteVideoTracks setObject:[stream.videoTracks lastObject] forKey:userId];
+    }
+    
     [self _refreshRemoteView];
     FLLog(@"addRemoteStream");
 }

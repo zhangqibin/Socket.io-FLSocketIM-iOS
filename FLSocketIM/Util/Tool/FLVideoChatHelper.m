@@ -609,6 +609,8 @@ didSetSessionDescriptionWithError:(NSError *)error
 - (void)createDataChannelWithPeerConnection:(RTCPeerConnection*)peerConnection connectionId:(NSString*)connectionId{
     RTCDataChannelInit *config = [[RTCDataChannelInit alloc] init];
     config.isOrdered = YES;
+    //  streamId 必须设置 streamId（>= 0），且双方需要设置同一值，否则虽然消息在底层能收到，但会被丢弃掉，上层不会收到回调。
+    config.streamId = 25;
     //_peerConnection 在此时必须已经创建了
     RTCDataChannel *localDataChannel = [peerConnection createDataChannelWithLabel:@"commands" config:config];
     localDataChannel.delegate = self;
@@ -661,9 +663,11 @@ didSetSessionDescriptionWithError:(NSError *)error
 - (void)channel:(RTCDataChannel*)channel didReceiveMessageWithBuffer:(RTCDataBuffer*)buffer
 {
     //收到RTCDataChannel对面发送过来的消息. 自己去解析就好
-    UIAlertView *t = [[UIAlertView alloc] initWithTitle:@"新消息" message:nil delegate:nil cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
-    [t show];
-    NSLog(@"dddd");
+    NSError *err;
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:buffer.data
+                                                        options:NSJSONReadingMutableContainers
+                                                          error:&err];
+    NSLog(@"dddd  %@", dic);
 }
 
 

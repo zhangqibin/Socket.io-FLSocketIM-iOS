@@ -8,7 +8,7 @@
 
 // 服务器地址
 //#define BaseUrl                                 @"http://192.168.100.134:3000"
-#define BaseUrl                                 @"http://10.235.62.12:3000"
+#define BaseUrl                                 @"http://192.168.80.151:3000"
 //#define BaseUrl                                 @"http://119.4.45.59:3000"
 
 // 登录接口

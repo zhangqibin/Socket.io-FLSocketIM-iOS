@@ -198,6 +198,7 @@
 		39E91558BEC0923F3217B8EA /* Pods_FLSocketIMTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A9BEE4FF0EDD70CD2F3C976C /* Pods_FLSocketIMTests.framework */; };
 		7B6B88B802C316BC70E027C1 /* Pods_FLSocketIM.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8653D711C85AC9A60FF0F41 /* Pods_FLSocketIM.framework */; };
 		7CBA30BF340E9FAB83805313 /* Pods_FLSocketIMUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 542B8E6B11EEA73C1E79ADFF /* Pods_FLSocketIMUITests.framework */; };
+		C10D25F9231275E90073D628 /* FLP2PChatHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C10D25F8231275E90073D628 /* FLP2PChatHelper.m */; };
 		FB1CAA8E22FAC0F900D99020 /* libWebRTC.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FB1CAA8D22FAC0F900D99020 /* libWebRTC.a */; };
 /* End PBXBuildFile section */
 
@@ -506,6 +507,8 @@
 		99B0DE39C13E8C3D514BEC6D /* Pods-FLSocketIM.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FLSocketIM.release.xcconfig"; path = "Pods/Target Support Files/Pods-FLSocketIM/Pods-FLSocketIM.release.xcconfig"; sourceTree = "<group>"; };
 		A9BEE4FF0EDD70CD2F3C976C /* Pods_FLSocketIMTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FLSocketIMTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4BEA84CA0A82AB7803BC424 /* Pods-FLSocketIMTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FLSocketIMTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-FLSocketIMTests/Pods-FLSocketIMTests.release.xcconfig"; sourceTree = "<group>"; };
+		C10D25F7231275E90073D628 /* FLP2PChatHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FLP2PChatHelper.h; sourceTree = "<group>"; };
+		C10D25F8231275E90073D628 /* FLP2PChatHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FLP2PChatHelper.m; sourceTree = "<group>"; };
 		CC8A2CA18374C844F19DBE63 /* Pods-FLSocketIMUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FLSocketIMUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-FLSocketIMUITests/Pods-FLSocketIMUITests.release.xcconfig"; sourceTree = "<group>"; };
 		D8653D711C85AC9A60FF0F41 /* Pods_FLSocketIM.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FLSocketIM.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB1CAA6F22FAC0F900D99020 /* RTCPair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RTCPair.h; sourceTree = "<group>"; };
@@ -1089,6 +1092,8 @@
 				1255BDCC1F2584080089F6D0 /* FLSystemTool.m */,
 				125A89B91F555CF000941102 /* FLVideoChatHelper.h */,
 				125A89BA1F555CF000941102 /* FLVideoChatHelper.m */,
+				C10D25F7231275E90073D628 /* FLP2PChatHelper.h */,
+				C10D25F8231275E90073D628 /* FLP2PChatHelper.m */,
 			);
 			path = Tool;
 			sourceTree = "<group>";
@@ -1707,6 +1712,7 @@
 				12BF1E451F3D40B7003A31E1 /* FLPlaceholderTextView.m in Sources */,
 				120065F41FDE8E3300478657 /* FLTabBar.m in Sources */,
 				129E31F31F1DA0CC00ECB93C /* NSDate+Helper.m in Sources */,
+				C10D25F9231275E90073D628 /* FLP2PChatHelper.m in Sources */,
 				123A9FE91F0E150700DCC9E9 /* ViewController.m in Sources */,
 				12D462241F288F7400507256 /* AudioManager.m in Sources */,
 				12D462231F288F7400507256 /* AudioAmrUtil.m in Sources */,

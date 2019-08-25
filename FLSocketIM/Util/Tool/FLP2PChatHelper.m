@@ -10,6 +10,8 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
+#import "RTCDataChannel.h"
+
 //google提供的
 static NSString *const RTCSTUNServerURL = @"stun:stun.l.google.com:19302";
 static NSString *const RTCSTUNServerURL2 = @"stun:23.21.150.121";
@@ -19,7 +21,7 @@ static NSString *const RTCSTUNServerURL2 = @"stun:23.21.150.121";
 //    //被发送者
 //    RoleCallee,
 //} Role;
-@interface FLP2PChatHelper () <RTCPeerConnectionDelegate, RTCSessionDescriptionDelegate>
+@interface FLP2PChatHelper () <RTCPeerConnectionDelegate, RTCSessionDescriptionDelegate, RTCDataChannelDelegate>
 
 @property (nonatomic, weak) SocketIOClient *client;
 
@@ -39,7 +41,8 @@ static NSString *const RTCSTUNServerURL2 = @"stun:23.21.150.121";
     //    Role _role;
     
     NSMutableArray *ICEServers;
-    
+    RTCDataChannel *_dataChannel;
+
 }
 
 static FLP2PChatHelper *instance = nil;
@@ -220,6 +223,11 @@ static FLP2PChatHelper *instance = nil;
  *  退出房间
  */
 - (void)exitRoom {
+    
+    NSData *data = [@"Hello World!" dataUsingEncoding:NSUTF8StringEncoding];
+    RTCDataBuffer *buffer =  [[RTCDataBuffer alloc] initWithData:data isBinary:false];//这个地方一定要选false. 安卓那边要求.具体不明
+    [_dataChannel sendData:buffer];
+    
     _localStream = nil;
     [_connectionIdArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self closePeerConnection:obj];
@@ -393,7 +401,42 @@ static FLP2PChatHelper *instance = nil;
     
     //用工厂来创建连接
     RTCPeerConnection *connection = [_factory peerConnectionWithICEServers:ICEServers constraints:[self peerConnectionConstraints] delegate:self];
+    RTCDataChannelInit *config = [[RTCDataChannelInit alloc] init];
+    config.isOrdered = YES;
+    //_peerConnection 在此时必须已经创建了
+    _dataChannel = [connection createDataChannelWithLabel:@"commands" config:config];
+    _dataChannel.delegate = self;
     return connection;
+}
+
+//代理1 判断是否打开成功
+- (void)channelDidChangeState:(RTCDataChannel *)channel {
+    switch (channel.state) {
+            
+        case kRTCDataChannelStateOpen:
+            // DSpersonKitLog(@"DataChannel 通道打开");
+            break;
+        case kRTCDataChannelStateClosing:
+            break;
+        case kRTCDataChannelStateClosed:
+            //DSpersonKitLog(@"DataChannel 关闭");
+        {
+            
+        }
+            break;
+        case kRTCDataChannelStateConnecting:
+            // DSpersonKitLog(@"DataChannel 正在开启");
+            break;
+        default:
+            break;
+    }
+}
+- (void)channel:(RTCDataChannel*)channel
+didReceiveMessageWithBuffer:(RTCDataBuffer*)buffer {
+    //收到RTCDataChannel对面发送过来的消息. 自己去解析就好
+    
+    NSLog(@"dddd");
+    
 }
 
 //初始化STUN Server （ICE Server）

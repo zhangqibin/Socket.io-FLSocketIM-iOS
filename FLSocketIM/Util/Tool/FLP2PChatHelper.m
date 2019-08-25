@@ -37,8 +37,9 @@ static NSString *const RTCSTUNServerURL2 = @"stun:23.21.150.121";
     NSString *_myId;
     NSMutableDictionary *_connectionDic;
     NSMutableArray *_connectionIdArray;
+    NSMutableDictionary *_localDataChannelDictionary;
     
-    //    Role _role;
+//    Role _role;
     
     NSMutableArray *ICEServers;
     RTCDataChannel *_dataChannel;
@@ -167,7 +168,7 @@ static FLP2PChatHelper *instance = nil;
         NSString *type = sdpDic[@"type"];
         NSString *socketId = dataDic[@"socketId"];
         
-        
+     
         
         //拿到这个点对点的连接
         RTCPeerConnection *peerConnection = [_connectionDic objectForKey:socketId];
@@ -177,7 +178,7 @@ static FLP2PChatHelper *instance = nil;
         [peerConnection setRemoteDescriptionWithDelegate:self sessionDescription:remoteSdp];
         
         //设置当前角色状态为被呼叫，（被发offer）
-        //        _role = RoleCallee;
+//        _role = RoleCallee;
         
         // 回复answer
         [peerConnection createAnswerWithDelegate:self constraints:[self offerOranswerConstraint]];
@@ -223,11 +224,6 @@ static FLP2PChatHelper *instance = nil;
  *  退出房间
  */
 - (void)exitRoom {
-    
-    NSData *data = [@"Hello World!" dataUsingEncoding:NSUTF8StringEncoding];
-    RTCDataBuffer *buffer =  [[RTCDataBuffer alloc] initWithData:data isBinary:false];//这个地方一定要选false. 安卓那边要求.具体不明
-    [_dataChannel sendData:buffer];
-    
     _localStream = nil;
     [_connectionIdArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self closePeerConnection:obj];
@@ -331,7 +327,7 @@ static FLP2PChatHelper *instance = nil;
 - (void)createOffers{
     //给每一个点对点连接，都去创建offer
     [_connectionDic enumerateKeysAndObjectsUsingBlock:^(NSString *key, RTCPeerConnection *obj, BOOL * _Nonnull stop) {
-        //        _role = RoleCaller;
+//        _role = RoleCaller;
         [obj createOfferWithDelegate:self constraints:[self offerOranswerConstraint]];
     }];
 }
@@ -360,7 +356,8 @@ static FLP2PChatHelper *instance = nil;
         
         //根据连接ID去初始化 RTCPeerConnection 连接对象
         RTCPeerConnection *connection = [self createPeerConnection:obj];
-        
+        //  给p2p连接创建dataChannel
+        [self createDataChannelWithPeerConnection:connection connectionId:obj];
         //设置这个ID对应的 RTCPeerConnection对象
         [_connectionDic setObject:connection forKey:obj];
     }];
@@ -391,7 +388,7 @@ static FLP2PChatHelper *instance = nil;
         
         [ICEServers addObject:[self defaultSTUNServer:RTCSTUNServerURL]];
         [ICEServers addObject:[self defaultSTUNServer:RTCSTUNServerURL2]];
-        //
+//
         //        for (NSString *url  in stunServer) {
         //            [ICEServers addObject:[self defaultSTUNServer:url]];
         //
@@ -401,42 +398,7 @@ static FLP2PChatHelper *instance = nil;
     
     //用工厂来创建连接
     RTCPeerConnection *connection = [_factory peerConnectionWithICEServers:ICEServers constraints:[self peerConnectionConstraints] delegate:self];
-    RTCDataChannelInit *config = [[RTCDataChannelInit alloc] init];
-    config.isOrdered = YES;
-    //_peerConnection 在此时必须已经创建了
-    _dataChannel = [connection createDataChannelWithLabel:@"commands" config:config];
-    _dataChannel.delegate = self;
     return connection;
-}
-
-//代理1 判断是否打开成功
-- (void)channelDidChangeState:(RTCDataChannel *)channel {
-    switch (channel.state) {
-            
-        case kRTCDataChannelStateOpen:
-            // DSpersonKitLog(@"DataChannel 通道打开");
-            break;
-        case kRTCDataChannelStateClosing:
-            break;
-        case kRTCDataChannelStateClosed:
-            //DSpersonKitLog(@"DataChannel 关闭");
-        {
-            
-        }
-            break;
-        case kRTCDataChannelStateConnecting:
-            // DSpersonKitLog(@"DataChannel 正在开启");
-            break;
-        default:
-            break;
-    }
-}
-- (void)channel:(RTCDataChannel*)channel
-didReceiveMessageWithBuffer:(RTCDataBuffer*)buffer {
-    //收到RTCDataChannel对面发送过来的消息. 自己去解析就好
-    
-    NSLog(@"dddd");
-    
 }
 
 //初始化STUN Server （ICE Server）
@@ -522,36 +484,36 @@ didSetSessionDescriptionWithError:(NSError *)error
 {
     NSLog(@"%s",__func__);
     
-    //    NSString *currentId = [self getKeyFromConnectionDic : peerConnection];
-    //
-    //    //判断，当前连接状态为，收到了远程点发来的offer，这个是进入房间的时候，尚且没人，来人就调到这里
-    //    if (peerConnection.signalingState == RTCSignalingHaveRemoteOffer)
-    //    {
-    //        //创建一个answer,会把自己的SDP信息返回出去
-    //        [peerConnection createAnswerWithDelegate:self constraints:[self offerOranswerConstraint]];
-    //    }
+//    NSString *currentId = [self getKeyFromConnectionDic : peerConnection];
+//
+//    //判断，当前连接状态为，收到了远程点发来的offer，这个是进入房间的时候，尚且没人，来人就调到这里
+//    if (peerConnection.signalingState == RTCSignalingHaveRemoteOffer)
+//    {
+//        //创建一个answer,会把自己的SDP信息返回出去
+//        [peerConnection createAnswerWithDelegate:self constraints:[self offerOranswerConstraint]];
+//    }
     //判断连接状态为本地发送offer
-    //    else if (peerConnection.signalingState == RTCSignalingHaveLocalOffer)
-    //    {
-    //        if (_role == RoleCallee)
-    //        {
-    //            [self.client emit:@"__answer" with:@[@{@"sdp": @{@"type": @"answer", @"sdp": peerConnection.localDescription.description}, @"socketId": currentId}]];
-    //
-    //        }
-    //        //发送者,发送自己的offer
-    //        else if(_role == RoleCaller)
-    //        {
-    //            [self.client emit:@"__offer" with:@[@{@"sdp": @{@"type": @"offer", @"sdp": peerConnection.localDescription.description}, @"socketId": currentId}]];
-    //        }
-    //    }
-    //    else if (peerConnection.signalingState == RTCSignalingStable)
-    //    {
-    //        if (_role == RoleCallee)
-    //        {
-    //            [self.client emit:@"__answer" with:@[@{@"sdp": @{@"type": @"answer", @"sdp": peerConnection.localDescription.description}, @"socketId": currentId}]];
-    //
-    //        }
-    //    }
+//    else if (peerConnection.signalingState == RTCSignalingHaveLocalOffer)
+//    {
+//        if (_role == RoleCallee)
+//        {
+//            [self.client emit:@"__answer" with:@[@{@"sdp": @{@"type": @"answer", @"sdp": peerConnection.localDescription.description}, @"socketId": currentId}]];
+//
+//        }
+//        //发送者,发送自己的offer
+//        else if(_role == RoleCaller)
+//        {
+//            [self.client emit:@"__offer" with:@[@{@"sdp": @{@"type": @"offer", @"sdp": peerConnection.localDescription.description}, @"socketId": currentId}]];
+//        }
+//    }
+//    else if (peerConnection.signalingState == RTCSignalingStable)
+//    {
+//        if (_role == RoleCallee)
+//        {
+//            [self.client emit:@"__answer" with:@[@{@"sdp": @{@"type": @"answer", @"sdp": peerConnection.localDescription.description}, @"socketId": currentId}]];
+//
+//        }
+//    }
 }
 
 #pragma mark--RTCPeerConnectionDelegate
@@ -624,8 +586,71 @@ didSetSessionDescriptionWithError:(NSError *)error
 - (void)peerConnection:(RTCPeerConnection*)peerConnection didOpenDataChannel:(RTCDataChannel*)dataChannel
 
 {
+    dataChannel.delegate = self;
     NSLog(@"%s",__func__);
 }
+
+#pragma mark - P2P Chat
+//  DataChannel的创建是在生成本地offer之前，这样才能在生成offer后，使offer中包含DataChannel的信息。
+- (void)createDataChannelWithPeerConnection:(RTCPeerConnection*)peerConnection connectionId:(NSString*)connectionId{
+    RTCDataChannelInit *config = [[RTCDataChannelInit alloc] init];
+    config.isOrdered = YES;
+    //_peerConnection 在此时必须已经创建了
+    RTCDataChannel *localDataChannel = [peerConnection createDataChannelWithLabel:@"commands" config:config];
+    localDataChannel.delegate = self;
+    [_localDataChannelDictionary setObject:localDataChannel forKey:connectionId];
+}
+
+//  这里需要说一下，如果使用RTCDataChannel发送图片，需要将type设置为image，并且进行base64编码。
+- (void)sendMessage:(NSString *)message
+{
+    NSDictionary* messageDic = @{@"type":@"text",@"value":message};
+    NSData* messageData = [NSJSONSerialization dataWithJSONObject:messageDic options:NSJSONWritingPrettyPrinted error:nil];
+    
+    RTCDataBuffer *buffer = [[RTCDataBuffer alloc] initWithData:messageData isBinary:NO];
+    
+    [_localDataChannelDictionary enumerateKeysAndObjectsUsingBlock:^(NSString* connectionId, RTCDataChannel* dataChannel, BOOL * _Nonnull stop) {
+        bool success = [dataChannel sendData:buffer];
+        if (success){
+            NSLog(@"sendmessageSuccess = %@",message);
+        }else{
+            NSLog(@"SendMessageFailed");
+        }
+    }];
+}
+
+#pragma mark - RTCDataChannelDelegate
+//代理1 判断是否打开成功
+- (void)channelDidChangeState:(RTCDataChannel *)channel
+{
+    switch (channel.state) {
+            
+        case kRTCDataChannelStateOpen:
+            // DSpersonKitLog(@"DataChannel 通道打开");
+            break;
+        case kRTCDataChannelStateClosing:
+            break;
+        case kRTCDataChannelStateClosed:
+            //DSpersonKitLog(@"DataChannel 关闭");
+        {
+            
+        }
+            break;
+        case kRTCDataChannelStateConnecting:
+            // DSpersonKitLog(@"DataChannel 正在开启");
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)channel:(RTCDataChannel*)channel didReceiveMessageWithBuffer:(RTCDataBuffer*)buffer
+{
+    //收到RTCDataChannel对面发送过来的消息. 自己去解析就好
+    
+    NSLog(@"dddd");
+}
+
 
 @end
 

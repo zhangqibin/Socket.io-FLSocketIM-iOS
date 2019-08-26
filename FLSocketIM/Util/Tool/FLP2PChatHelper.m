@@ -42,8 +42,7 @@ static NSString *const RTCSTUNServerURL2 = @"stun:23.21.150.121";
 //    Role _role;
     
     NSMutableArray *ICEServers;
-    RTCDataChannel *_dataChannel;
-
+    
 }
 
 static FLP2PChatHelper *instance = nil;
@@ -62,7 +61,7 @@ static FLP2PChatHelper *instance = nil;
 {
     _connectionDic = [NSMutableDictionary dictionary];
     _connectionIdArray = [NSMutableArray array];
-    
+    _localDataChannelDictionary = [NSMutableDictionary dictionary];
 }
 
 - (void)connectRoom:(NSString *)room {
@@ -225,6 +224,12 @@ static FLP2PChatHelper *instance = nil;
  */
 - (void)exitRoom {
     _localStream = nil;
+    
+    [_localDataChannelDictionary enumerateKeysAndObjectsUsingBlock:^(NSString *key, RTCDataChannel *obj, BOOL * _Nonnull stop) {
+        [obj close];
+        [_localDataChannelDictionary removeObjectForKey:key];
+    }];
+    
     [_connectionIdArray enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [self closePeerConnection:obj];
     }];
@@ -356,8 +361,7 @@ static FLP2PChatHelper *instance = nil;
         
         //根据连接ID去初始化 RTCPeerConnection 连接对象
         RTCPeerConnection *connection = [self createPeerConnection:obj];
-        //  给p2p连接创建dataChannel
-        [self createDataChannelWithPeerConnection:connection connectionId:obj];
+        
         //设置这个ID对应的 RTCPeerConnection对象
         [_connectionDic setObject:connection forKey:obj];
     }];
@@ -398,6 +402,10 @@ static FLP2PChatHelper *instance = nil;
     
     //用工厂来创建连接
     RTCPeerConnection *connection = [_factory peerConnectionWithICEServers:ICEServers constraints:[self peerConnectionConstraints] delegate:self];
+    
+    //  给p2p连接创建dataChannel
+    [self createDataChannelWithPeerConnection:connection connectionId:connectionId];
+    
     return connection;
 }
 
@@ -587,6 +595,12 @@ didSetSessionDescriptionWithError:(NSError *)error
 
 {
     dataChannel.delegate = self;
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(20 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self sendMessage:@"1"];
+    });
+    
+    
     NSLog(@"%s",__func__);
 }
 
@@ -595,6 +609,8 @@ didSetSessionDescriptionWithError:(NSError *)error
 - (void)createDataChannelWithPeerConnection:(RTCPeerConnection*)peerConnection connectionId:(NSString*)connectionId{
     RTCDataChannelInit *config = [[RTCDataChannelInit alloc] init];
     config.isOrdered = YES;
+    //  streamId 必须设置 streamId（>= 0），且双方需要设置同一值，否则虽然消息在底层能收到，但会被丢弃掉，上层不会收到回调。
+    config.streamId = 25;
     //_peerConnection 在此时必须已经创建了
     RTCDataChannel *localDataChannel = [peerConnection createDataChannelWithLabel:@"commands" config:config];
     localDataChannel.delegate = self;
@@ -647,8 +663,11 @@ didSetSessionDescriptionWithError:(NSError *)error
 - (void)channel:(RTCDataChannel*)channel didReceiveMessageWithBuffer:(RTCDataBuffer*)buffer
 {
     //收到RTCDataChannel对面发送过来的消息. 自己去解析就好
-    
-    NSLog(@"dddd");
+    NSError *err;
+    NSDictionary *dic = [NSJSONSerialization JSONObjectWithData:buffer.data
+                                                        options:NSJSONReadingMutableContainers
+                                                          error:&err];
+    NSLog(@"dddd  %@", dic);
 }
 
 

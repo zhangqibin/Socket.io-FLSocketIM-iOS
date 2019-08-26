@@ -1396,7 +1396,7 @@
 				TargetAttributes = {
 					123A9FDD1F0E150700DCC9E9 = {
 						CreatedOnToolsVersion = 8.3.3;
-						DevelopmentTeam = R4X9QN6748;
+						DevelopmentTeam = YL54YCP9QW;
 						LastSwiftMigration = 0830;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -1924,7 +1924,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = R4X9QN6748;
+				DEVELOPMENT_TEAM = YL54YCP9QW;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1966,7 +1966,7 @@
 					"-weak_framework",
 					RevealServer,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.foxPower.SocketIM2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.foxPower.SocketIM25566;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1984,7 +1984,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = R4X9QN6748;
+				DEVELOPMENT_TEAM = YL54YCP9QW;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2024,7 +2024,7 @@
 					"-weak_framework",
 					RevealServer,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.foxPower.SocketIM2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.foxPower.SocketIM25566;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
